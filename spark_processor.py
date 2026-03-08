@@ -4,8 +4,11 @@ from pyspark.sql.functions import from_json
 from pyspark.sql.types import StructType, StringType, IntegerType
 from pyspark.sql.functions import regexp_replace
 
+
+
 spark = SparkSession.builder \
     .appName("HackerNewsProcessor") \
+    .config("spark.jars.packages", "org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.0") \
     .getOrCreate()
 
 df = spark.readStream.format("kafka")\
