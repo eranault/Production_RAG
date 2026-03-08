@@ -3,10 +3,12 @@ from pyspark.sql.functions import col
 from pyspark.sql.functions import from_json
 from pyspark.sql.types import StructType, StringType, IntegerType
 from pyspark.sql.functions import regexp_replace
-
+from pyspark.sql.functions import to_json, struct
 import os
+
 os.environ["HADOOP_HOME"] = "C:\\hadoop"
 os.environ["JAVA_HOME"] = "C:\\Program Files\\Java\\jdk-17.0.18"
+os.environ["PATH"] = "C:\\hadoop\\bin;" + os.environ.get("PATH", "") 
 
 spark = SparkSession.builder \
     .appName("HackerNewsProcessor") \
@@ -37,9 +39,14 @@ json_df = df.select(from_json(col("value"), schema).alias("story")).select("stor
 df_json = json_df.withColumn("text", regexp_replace("text", "<[^>]+>", ""))
 
 
+df_json = df_json.select(to_json(struct("*")).alias("value"))
+
 query = df_json.writeStream \
     .outputMode("append") \
-    .format("console") \
+    .format("kafka") \
+    .option("kafka.bootstrap.servers", "localhost:9092") \
+    .option("topic", "hackernews-processed") \
+    .option("checkpointLocation", "C:/tmp/spark-checkpoint") \
     .start()
 
 query.awaitTermination()
