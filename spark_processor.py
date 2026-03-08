@@ -4,13 +4,14 @@ from pyspark.sql.functions import from_json
 from pyspark.sql.types import StructType, StringType, IntegerType
 from pyspark.sql.functions import regexp_replace
 
-
+import os
+os.environ["HADOOP_HOME"] = "C:\\hadoop"
+os.environ["JAVA_HOME"] = "C:\\Program Files\\Java\\jdk-17.0.18"
 
 spark = SparkSession.builder \
     .appName("HackerNewsProcessor") \
-    .config("spark.jars.packages", "org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.0") \
+    .config("spark.jars.packages", "org.apache.spark:spark-sql-kafka-0-10_2.13:4.0.0") \
     .getOrCreate()
-
 df = spark.readStream.format("kafka")\
                      .option("kafka.bootstrap.servers","localhost:9092")\
                      .option("subscribe","hackernews-stories") \
