@@ -13,6 +13,8 @@ os.environ["PATH"] = "C:\\hadoop\\bin;" + os.environ.get("PATH", "")
 spark = SparkSession.builder \
     .appName("HackerNewsProcessor") \
     .config("spark.jars.packages", "org.apache.spark:spark-sql-kafka-0-10_2.13:4.0.0") \
+    .config("spark.driver.host", "localhost") \
+    .config("spark.driver.bindAddress", "127.0.0.1") \
     .getOrCreate()
 df = spark.readStream.format("kafka")\
                      .option("kafka.bootstrap.servers","localhost:9092")\
