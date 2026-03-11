@@ -5,7 +5,7 @@ import httpx
 import motor.motor_asyncio
 from dotenv import load_dotenv
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from confluent_kafka import Producer
+
 import json
 
 load_dotenv()
@@ -41,16 +41,11 @@ async def save_to_mongodb(stories):
     except Exception as e:
         print(f"Error saving to MongoDB: {e}")
 
-producer = Producer({'bootstrap.servers': 'localhost:9092'})
+
 
 async def crawl():
     print("Crawling...")
     stories = await get_stories()
-    for story in stories : 
-        if story is not None:
-            producer.produce('hackernews-stories', value=(json.dumps(story)))
-            producer.flush()
-    
     await save_to_mongodb(stories)
     print(f"Done — saved {len([s for s in stories if s])} stories")
 
